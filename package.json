@@ -1,0 +1,13 @@
+{
+  "name": "twitch-game-events-ebs-sample",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "request": "^2.86.0",
+    "request-promise-native": "^1.0.5",
+    "socket.io-client": "^2.1.0"
+  }
+}
