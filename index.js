@@ -1,10 +1,22 @@
 let io = require('socket.io-client');
 const request = require('request-promise-native');
 
-const OUR_STREAMER_ID = 'xxx';
-const CLIENT_KEY = 'OWXXXXXXXX';
-const CLIENT_SECRET = 'xxxxxxxxxxxxxxxxxxxxx';
+const OUR_STREAMER_ID = '12345678';
+const CLIENT_KEY = 'OW123456789ABCDEF';
+const CLIENT_SECRET = '11111111111111111111111111111111';
 const PUBSUB_URL = 'https://twitchge.overwolf.com';
+
+const waitSocket = (socket) => {
+  return new Promise((resolve, reject) => {
+    socket.once("error", (err) => {
+      reject(err);
+    });
+
+    socket.once("connect", () => {
+      resolve(socket);
+    });
+  });
+};
 
 async function getStreamerInfo(id, token) {
   try {
@@ -56,6 +68,7 @@ async function getStreamerGame(id, token) {
     });
 
     let token = response.token;
+
     const socketio = io(PUBSUB_URL, {
       "transports": [ "websocket" ],
       "query": `token=${token}`
@@ -70,10 +83,15 @@ async function getStreamerGame(id, token) {
 
     socketio.on('publish', function(data) {
       console.log(`EVENT ${JSON.stringify(data)}`);
+      if (data[0] === 'sessionStart') {
+        getStreamerInfo(OUR_STREAMER_ID, token);
+      }
     });
+
     socketio.on('disconnect', function() {
       console.log('DISCONNECT');
     });
+
   } catch (e) {
     console.error(e);
   }
